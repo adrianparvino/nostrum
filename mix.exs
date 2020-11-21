@@ -88,6 +88,7 @@ defmodule Nostrum.Mixfile do
 
   defp deps do
     [
+      {:lib_opus, git: "https://github.com/adrianparvino/lib_opus"},
       {:httpoison, "~> 1.7"},
       {:poison, "~> 3.0"},
       {:gun, "~> 1.3"},

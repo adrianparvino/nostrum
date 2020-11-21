@@ -125,7 +125,12 @@ defmodule Nostrum.Voice do
       true ->
         unless is_nil(voice.ffmpeg_proc), do: Proc.stop(voice.ffmpeg_proc)
         set_speaking(voice, true)
-        voice = update_voice(guild_id, ffmpeg_proc: Audio.spawn_ffmpeg(input, type))
+
+        ffmpeg_proc = Audio.spawn_ffmpeg(input, type)
+
+        {:ok, encoder_pid} = LibOpus.start(ffmpeg_proc.out)
+
+        voice = update_voice(guild_id, encoder_pid: encoder_pid, ffmpeg_proc: ffmpeg_proc)
         {:ok, pid} = Task.start(fn -> Audio.init_player(voice) end)
         update_voice(guild_id, player_pid: pid)
         :ok

@@ -13,7 +13,8 @@ defmodule Nostrum.Voice.Audio do
   @samples_per_frame 960
   @usec_per_frame 20_000
   # How many consecutive packets to send before resting
-  @frames_per_burst 10
+  @frames_per_burst 1
+
 
   def encryption_mode, do: @encryption_mode
 
@@ -71,10 +72,7 @@ defmodule Nostrum.Voice.Audio do
     wait = if(init?, do: 20_000, else: 200)
     {:ok, watchdog} = :timer.apply_after(wait, __MODULE__, :on_stall, [voice])
 
-    {voice, done} =
-      voice.ffmpeg_proc.out
-      |> Enum.take(@frames_per_burst)
-      |> send_frames(voice)
+    {voice, done} = send_frames([LibOpus.get_packet(voice.encoder_pid)], voice)
 
     :timer.cancel(watchdog)
 
@@ -152,7 +150,6 @@ defmodule Nostrum.Voice.Audio do
           ["-ac", "2"],
           ["-ar", "48000"],
           ["-f", "s16le"],
-          ["-acodec", "libopus"],
           ["-loglevel", "quiet"],
           ["pipe:1"]
         ]
