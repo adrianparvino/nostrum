@@ -109,7 +109,6 @@ defmodule Nostrum.Voice.Audio do
       Porcelain.spawn(
         Application.get_env(:nostrum, :youtubedl, "youtube-dl"),
         [
-          ["-f", "bestaudio"],
           ["-o", "-"],
           ["-q"],
           [url]
